@@ -1,0 +1,343 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Calibration</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo">HydroCORE</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="../index.html">Intro</a></li>
+							<li><a href="../hydrology.html">Hydrology</a></li>
+							<li><a href="delineation.html">Delineation</a></li>
+							<li><a href="preparation.html">Preparation</a></li>
+							<li class="active"><a href="calibration.html">Calibration</a></li>
+							<li><a href="application.html">Application</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://github.com/wvechelp/HydroCORE" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+						<section class="post">
+							
+							<!-- Text stuff -->
+							<header>
+								<h2>Model calibration</h2>
+							</header>
+							<p> After completing the <a href="delineation.html">delineation</a> of the hydrological response units (HRUs) and <a href="preparation.html">preparing</a> the 
+								weather/climate data, we have come to the point of developing and calibrating a hydrological model via SWAT+. To do so, we will be using the SWAT+Editor 
+								interface to (1) load the delineated HRUs (and overall watershed) and (2) upload both the station-specific time series, as well as the derived climate 
+								statistics. This represents the baseline input of the hydrological model and only needs to be changed to derive the sensitivity to a change in the HRU 
+								delineation procedure or when the interests lie in the impact of <b>different climate conditions</b> on the hydrological processes within the basin. </p>
+							<p> The SWAT+Editor is positioned as the main interface between the user and the modelling, allowing changes in parameter values at basin/subbasin/HRU level. For 
+								instance, it allows to change the approach to calculate the amount of evaporation, as well as change the temperature lapse rate (i.e., the decrease in air 
+								temperature for every 1000 m increase in elevation). The interface also allows to define if plant growth takes place and if this is exposed to any kind of 
+								water or nutrient stress. Moreover, these plant communities can be defined specifically for the project at hand, allowing changes in the minimum air temperature 
+								to support growth, the depth of root growth, and the type of management applied. A last example of potential changes includes the characteristics of the soil 
+								(like permeability, saturation, depth, ...). While the options are almost endless, we will only use a few of them. But first, we have to start our SWAT+Editor,
+								which typically results in a summary of the delineated watershed, as shown below.</p> 
+							
+							<span class="image fit"><img src="../images/H12_WatershedStatistics.jpg" alt="" /></span>
+
+							<header>
+								<h3>Performance assessment</h3>
+							</header>
+							<p style="margin-bottom: 1%"> An important element of model calibration, is the comparison of the simulated and observed time series, along with a quantification 
+								of the accuracy. To do so, we consider the following two categories of calibration: 
+								<ol>
+									<li><b>Soft calibration</b> - Field observations are used to derive broad statistics on rainfall, evapotranspiration, … and subsequently help in assessing 
+										the hydrologic and climatic correctness of the model. This includes both meteorological and hydrologic conditions, often considered at an annual and 
+										basin-wide scale. </li>
+									<li><b>Hard calibration</b> - Field observations are used to derive daily or monthly statistics on river flow and subsequently help in assessing the hydrologic 
+										correctness of the model. For this, we use specific statistics (like Nash-Sutcliffe efficiency, coefficient of determination, percent bias) to compare 
+										both time series, while also providing insight into the sensitivity of the model towards changes in specific model parameters (as part of a sensitivity 
+										assessment - see further). </li>
+								</ol></p> 
+
+							<header>
+								<h3>Parameter setting</h3>
+							</header>
+							<p style="margin-bottom: 1%"> The SWAT+Editor starts with a whole collection of default parameter values, which makes it possible to develop a hydrological model 
+								without any changes in the used parameter space. However, it is highly likely that a combination of all default parameter values will not result in the most 
+								accurate model for every case study. For our project in the Paute river basin, additional changes are made in the section <i>Basin</i>:
+								<ul>
+									<li>Basin > Codes > Priestley-Taylor as PET method</li>
+									<li>Basin > Codes > Stress codes equal to 1 ('Turn of all plant stress')</li>
+									<li>Basin > Codes > Allow adjustment for elevation</li>
+									<li>Basin > Parameters > Adapt temperature lapse rate to 6.5 °C/km</li>
+								</ul> </p>
+							<p style="margin-bottom: 1%"> Most of the land use within the Paute basin is natural of some sorts, which means that plants grow and support the transpiration of water. 
+								Meanwhile, these plants also limit the evaporation from the soil. To allow for these plants to grow within the model environment, the following changes can be made 
+								as well (under Land use management > Plant communities and changing for every plant community): 
+								<ul>
+									<li>Land cover status to 'Yes' (i.e. is it growing?)</li>
+									<li>LAI to maximum/minimum LAI of community (click on community name)</li>
+									<li>Initial biomass to 1000 kg/ha</li>
+									<li>Fraction of years to maturity to 1</li>
+								</ul> </p>
+
+							<header>
+								<h3>Soft calibration</h3>
+								<h4>Observations</h4>
+							</header>
+							<p style="margin-bottom: 1%"> We start our soft calibration with analyzing the observed weather conditions in the basin. For this, we are interested in the bigger picture, 
+								hence we will look at the annual level to summarize our observations. More specifically, we will have a look at the following statistics:
+								<ul>
+									<li>Average annual precipitation within the basin</li>
+									<li>Average annual (potential) evaporation within the basin</li>
+									<li>Average annual temperatures (including min-max) within the basin</li>
+									<li>Average annual humidity within the basin</li>
+									<li>Average annual wind speed within the basin</li>
+									<li>Average annual radiation within the basin</li>
+								</ul> </p>
+							<p> <span class="image right"><img src="../images/H13_ObservedRainfall.jpg" alt="" /></span> The graph on the right provides an example of such an analysis, illustrating the 
+								average annual precipitation in each of the included weather stations. Based on these values, the derived basin-wide average is 1141 ± 541 mm/year (or 1040 ± 315 mm/year 
+								without M0217). Similar analyses can be made for evaporation, temperature, humidity, wind speed, and radiation (see table). </p>
+
+							<!-- Table -->
+							<div class="table-wrapper">
+								<table>
+									<thead >
+										<tr>
+											<th style="text-align: left">Variable</th>
+											<th style="text-align: left">Value</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td style="text-align: left">Precipitation</td>
+											<td style="text-align: left">1141 ± 541 mm/year</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Relative humidity</td>
+											<td style="text-align: left">83 ± 6 %</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Wind speed</td>
+											<td style="text-align: left">0.6 ± 0.1 m/s</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Maximum air temperature</td>
+											<td style="text-align: left">20 ± 4 °C</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Minimum air temperature</td>
+											<td style="text-align: left">10 ± 2 °C</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Observed solar radiation</td>
+											<td style="text-align: left">5475 MJ/m²/year (1 station via FAO formula)</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Satellite solar radiation</td>
+											<td style="text-align: left">5885 ± 329 MJ/m²</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Potential evapotranspiration</td>
+											<td style="text-align: left">1374 ± 808 mm/year</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">Satellite actual evapotranspiration</td>
+											<td style="text-align: left">897 ± 49 mm/year</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>							
+							
+							<header>
+								<h4>Simulated meteorology</h4>
+							</header>
+							<p> Soft calibration of the model based on the simulated meteorology can be performed in two main steps: (1) an overall spatial analysis and (2) a station-specific analysis 
+								of annual averages. Within our Paute project, the assessment of the spatial distribution shows that most meteorological conditions align with the expectations. The figure 
+								below shows the spatial distribution of the meteorological conditions, though it should be noted that this model <b>excluded the virtual meteorological stations</b>. 
+								A similar assessment can be made for precipitation and the resulting runoff. </p>
+							
+							<span class="image fit"><img src="../images/H14_PauteMeteorology.jpg" alt="" /></span>
+							
+							<p> While the spatial distribution aligns more or less with our expectations, this might not be the case with the underlying time series. Simulations that were made via the 
+								SWAT+ software can be extracted from the underlying generated database, but this requires some attention. Every channel, HRU, and landscape unit (LSU) is given a unique 
+								number that should be used to consult the associated time series. For meteorological stations, we are interested in the HRU or LSU in which the station is located. We 
+								can identify this unique code via QGIS, followed by a search of the HRU report that can be consulted through the main SWAT+ dialog box. These codes remain the same, as 
+								long as the delineation of the watershed is not changed. These linkages allow to consult the appropriate time series and derive the necessary annual statistics for 
+								comparison with the observed conditions. </p>
+							<p> <span class="image right"><img src="../images/H15_PauteRainfall.jpg" alt="" /></span> For our Paute project, the simulated meteorological conditions align relatively well 
+								with the observations, though station M1111 tends to be a more frequent mismatch. The graph on the right illustrates the comparison of the average daily precipitation 
+								in a selection of stations, with both observed (green) and simulated (yellow) precipitation values. It displays an overall great overlap, though also generates more days 
+								with lower amounts of rainfall than present within the observed time series.</p>
+							
+							<header>
+								<h4>Simulated flow</h4>
+							</header>
+							<p> <span class="image right"><img src="../images/H16_PauteFlows.jpg" alt="" /></span> Similar to the extraction of the meteorological conditions, we first have to identify 
+								our channels in the internal variable coding of SWAT+. This means that we have to identify the channel code via QGIS and translated to a unique number via a <i>channel_sd</i> 
+								file in the <i>TxtInOut</i> folder. Following this linkage, we can extract the appropriate time series and analyse them (1) visually and (2) statistically. The graph on 
+								the right illustrates a visual assessment of the modelled flows in a selection of hydrological stations within the Paute basin, displaying a general overlap between 
+								observed (blue) and simulated (pink) river flows.
+							</p>
+
+							<header>
+								<h3>Sensitivity analysis</h3>
+							</header>
+							<p> As mentioned earlier, SWAT+ comes with a set of default parameter values that allow to directly generate a hydrological model. Yet, this model can likely be improved by changing 
+								parameter values to better represent the study area. Given this, a variety of model parameters can be identified that directly have an influence on the outcomes: CN2 (SCS curve 
+								number for moisture condition II), SOL_AWC (available soil water content), SOL_K (saturated hydraulic conductivity), ESCO (Evaporation compensation factor), EPCO (Plant uptake 
+								compensation factor), PERCO (Percolation coefficient), ALPHA (groundwater flow response), LAT_TTIME (Lateral flow time), LAT_LEN (Average slope length), … Each of these parameters 
+								is characterized by a value range that can be explored as part of a sensitivity analysis. This analysis allows to identify those parameters that have an above-average influence on 
+								the performance of the model, which supports the further finetuning of the model towards the case at hand. The table below gives an indication of the parameters, their range, the 
+								suggested change type (<i>Absolute</i>: Change with the specified value - <i>Percentage</i>: Change with the specified percentage - <i>Replace</i>: Replace value with the specified 
+								value), and the value range to consider during the multi-loop sensitivity analysis. </p>
+							
+							<!-- Table -->
+							<div class="table-wrapper">
+								<table>
+									<thead >
+										<tr>
+											<th style="text-align: left">Parameter</th>
+											<th style="text-align: left">Range</th>
+											<th style="text-align: left">Change type</th>
+											<th style="text-align: left">Range value change</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td style="text-align: left">HRU_CN2</td>
+											<td style="text-align: left">1 - 100</td>
+											<td style="text-align: left">Absolute</td>
+											<td style="text-align: left">[-15, 10]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">SOL_AWC</td>
+											<td style="text-align: left">0.01 - 1</td>
+											<td style="text-align: left">Percentage</td>
+											<td style="text-align: left">[-20, 20]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">SOL_K</td>
+											<td style="text-align: left"></td>
+											<td style="text-align: left">Percentage</td>
+											<td style="text-align: left">[-20, 20]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">HRU_EPCO</td>
+											<td style="text-align: left">0.01 - 1</td>
+											<td style="text-align: left">Replace</td>
+											<td style="text-align: left">[0.01, 1]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">HRU_ESCO</td>
+											<td style="text-align: left">0.01 - 1</td>
+											<td style="text-align: left">Replace</td>
+											<td style="text-align: left">[0.01, 1]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">HRU_PERCO</td>
+											<td style="text-align: left">0 - 1</td>
+											<td style="text-align: left">Replace</td>
+											<td style="text-align: left">[0.1, 0.8]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">AQU_ALPHA</td>
+											<td style="text-align: left">0.1 - 1</td>
+											<td style="text-align: left">Replace</td>
+											<td style="text-align: left">[0.1, 0.8]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">HRU_LAT_TTIME</td>
+											<td style="text-align: left">0.5 - 100</td>
+											<td style="text-align: left">Replace</td>
+											<td style="text-align: left">[0.5, 5]</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">HRU_LAT_LEN</td>
+											<td style="text-align: left">0 - INF</td>
+											<td style="text-align: left">Absolute</td>
+											<td style="text-align: left">[-10, 20]</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>								
+							
+							<p> As a result from this sensitivity analysis, a visual overview of parameter influence can be generated to support both parameter and model finetuning. The graph below illustrates 
+								the outcome of our sensitivity analysis for the Paute basin, focusing on eight hydrological stations (mostly in the upstream part of the basin). It shows an overall limited 
+								sensitivity to the chosen parameters, though some stations seem to benefit from a decrease in the parameter PERCO (describing the percolation of the soil). This is useful for 
+								developing a final model configuration that will also be used for future scenarios (under the assumption that the main soil and vegetation characteristics remain unchanged). </p>
+							
+							<span class="image fit"><img src="../images/H17_SensitivityAnalysis.jpg" alt="" /></span>
+
+							<p> While model calibration entails a wide variety of techniques and approaches, we have highlighted the most important ones for our specific project on the Paute river basin. At this 
+								point, we have a working model that can be applied to derive future flow conditions under a changing climate. More information on this can be found on the page related to 
+								<a href="application.html"><i>Future flows</i></a>. </p>
+
+							<div class="box alt">
+								<div class="row gtr-50 gtr-uniform">
+									<div class="col-4"><span class="image fit"><img src="../images/C01_Main.JPG" alt="" /></span></div>
+									<div class="col-4"><span class="image fit"><img src="../images/C01_Reservoir.JPG" alt="" /></span></div>
+									<div class="col-4"><span class="image fit"><img src="../images/C02_Main.JPG" alt="" /></span></div>
+								</div>
+							</div>
+
+						</section>
+
+					</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<section class="split contact">
+						<section class="alt">
+							<p><b>Ecuador</b><br />
+								Laboratorio de Ecología Acuática (LEA)<br />
+								Av. Víctor Manuel Albornoz, 010207 Cuenca, Ecuador<br />
+							</p>
+						</section>
+					</section>
+					<section class="split contact">
+						<section class="alt">
+							<p><b>Belgium</b><br />
+								<a href="https://www.ugent.be/bw/asae/en/research/aeco" target="_blank">Research group Aquatic Ecology (AECO)</a><br />
+								Coupure Link 653, 9000 Ghent, Belgium
+							</p>
+						</section>
+					</section>
+					<section class="split contact">
+						<section>
+							<div class="image main"><img src="../images/EULogo.png" alt="" /></div>
+						</section>
+					</section>
+				</footer>	
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; <a href="https://wvechelp.github.io/">WVE</a></li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li><li>Images: WVE</li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>

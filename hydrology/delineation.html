@@ -1,0 +1,350 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Delineation</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo">HydroCORE</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="../index.html">Intro</a></li>
+							<li><a href="../hydrology.html">Hydrology</a></li>
+							<li class="active"><a href="delineation.html">Delineation</a></li>
+							<li><a href="preparation.html">Preparation</a></li>
+							<li><a href="calibration.html">Calibration</a></li>
+							<li><a href="application.html">Application</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://github.com/wvechelp/HydroCORE" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+						<section class="post">
+							
+							<!-- Text stuff -->
+							<header>
+								<h2>Watershed delineation</h2>
+							</header>
+							<p> So far, we have already shortly talked about the data and software that we think we will need to be able to model river flow within the Paute river basin (see the 
+								<a href="../hydrology.html">Introduction</a>). We will now use (part of) this data and software to spatially delineate the watershed. This will help to define up 
+								to which geographical point we have to consider the prevailing rainfall and later on exclude meteorological stations that are located outside our watershed. Also, 
+								the delineation will give us an insight into the different subbasins and how they contribute to the final flow of the Paute river. As such, this delineation is a 
+								useful step towards the development of a hydrological model. </p>
+							<p> Watershed delineation is, in the first place, based on the elevation of the landscape. Starting from a specific point of interest (e.g., a lake, a specific river, 
+								or the outflow of a basin), the complete upstream region can be defined by considering (changes in elevation). On top of this spatial extent, also the local 
+								characteristics of land usage and prevailing soils define how precipitation will behave. In a vegetated area, precipitation can be intercepted and evaporated into 
+								the atmosphere without even touching the ground. Meanwhile, precipitation that reaches the ground can be taken up by the vegetation or infiltrate the soil up to a 
+								certain maximum amount. What remains will typically flow on or within the topsoil and run off to the nearest stream/river/lake/reservoir/... </p> 
+							<p> This means that calculations of the water balance are very location-specific and require a lot of computational power. However, grouping regions with seemingly 
+								similar vegetation and soil characteristics into hydrological units can reduce these calculations and increase simplicity. This is exactly the idea behind the 
+								approach of <b>SWAT+</b>. Through its available plugin for QGIS, this delineation can be performed in a structured and uniform manner that supports reproducability. 
+								These different steps are mentioned here, starting with the preparation of the Digital Elevation Model and the associated river network and lake delineation. Then, 
+								the land use and soil characteristics are added prior to defining the hydrological response units. Following this delineation, the meteorological data is prepared 
+								to represent the climate within the basin, as well as to act as time series at specific locations. This information will be added later. </p>
+							
+							<header>
+								<h3>DEM preparation</h3>
+							</header>
+							<p> <span class="image right"><img src="../images/H01_DEM_Map.jpg" alt="" /></span> As indicated, we have to start with a digital elevation model (DEM) that covers 
+								the complete watershed and preferably does not have any missing data/pixels. Luckily, such DEMs can be downloaded via the CGIAR-CSI GeoPortal (click 
+								<a href="https://srtm.csi.cgiar.org/" target="_blank">here</a>), which are based on the original DEMs from the NASA Shuttle Radar Topographic Mission (SRTM). 
+								The spatial resolution of these DEMs is approximately 90 m at the equator, with a vertical error  ofless than 16 m. Interpolation was performed to fill the 
+								no-data gaps in the original NASA files (due to clouds, …). As the exact location of the watershed on the world map with DEM tiles, the figure on the right 
+								indicates which tile can be used. </p>
+							<p> Subsequently, the downloaded DEM is clipped in <b>QGIS</b> (xmin = -79.43, xmax = -78.24, ymin = -3.36, ymax = -2.27) to exclude all irrelevant information and 
+								speed up the calculations required for delineating the river network, the reservoirs, and the complete watershed (see further). The no-data value is set at 
+								-32768 and the clipped DEM is reprojected to an “equal-area” projection, i.e. Universal Transverse Mercator (UTM) or EPSG 32717 (which is also known as UTM 17S). 
+								This reprojected DEM is then saved and used as a baseline throughout the HydroCORE project. </p>
+
+							<header>
+								<h3>River network delineation</h3>
+							</header>
+							<p> Aside from information on the elevation gradients throughout the watershed, SWAT+ also needs to know where water bodies within the watershed are located to define 
+								the different subbasins and hydrological response units. Even though shapefiles of the streams and rivers within the Paute river basin may already exist, we opt 
+								to use the abovementioned clipped and reprojected DEM derive the whole river network within the watershed. This is done by following the instructions explained 
+								in <a href="https://www.youtube.com/watch?v=xwiHQlmEEjw&list=PLLxyyob7YmEHFg5xvwszKIo_sNZbczlNC&index=3&ab_channel=GeoDeltaLabs" target="_blank">this video</a> 
+								(though no analysis of Strahler order is included). The delineation strongly depends on the chosen endpoint, for which the confluence with the Upano river is 
+								chosen. Note that this calculation will be done on the clipped DEM, which means that also streams and rivers outside the watershed will be identified. The obtained 
+								shapefile of the river network will have the same geographical extent as the DEM used to derive it. But no worries, this does not affect the creation of the 
+								hydrological response units, as these will be purely based on the chosen flow endpoint (i.e., the confluence with the Upano river). </p>
+							<p style="margin-bottom: 1%"> In short, the following steps were taken by making use of the <b>SAGA plugin in QGIS</b>: 
+								<ol>
+									<li> Filling of DEM (Processing Toolbox > 'fill (wang & liu)') </li>
+									<li> Creation of river network (Processing Toolbox > 'Channel network and drainage basin') </li>
+									<li> Saving the river network as a temporary file and excluding the ID-column </li>
+									<li> Identification of outflow location (New shapefile > Points) </li>
+									<li> Derivation of river basin (Processing Toolbox > 'upslope area') </li>
+									<li> Conversion of upslope raster to shapefile </li>
+									<li> Clip DEM with the derived shapefile of the basin </li>
+									<li> Clip River network with the derived shapefile of the basin </li>
+								</ol> </p>
+
+							<header>
+								<h3>Reservoir delineation</h3>
+							</header>
+							<p> In contrast to the river network, reservoirs cannot be delineated based on the DEM. Instead, two main pathways can be identified: (1) manual delineation 
+								based on a satellite map, or (2) automatic identification based on satellite maps. </p>
+							<p> <b>Manual delineation</b> is relatively straightforward. One of the options to do so, entails loading a Google Satellite basemap in QGIS (as explained 
+								<a href="https://opensourceoptions.com/how-to-add-google-satellite-imagery-and-google-maps-to-qgis/" target="_blank">here</a>) and the subsequent creation 
+								of a new layer in which the reservoir polygons will be drawn. What remains is the tedious work of drawing the polygons based on the satellite image. When 
+								applying this approach, it is important to verify if the satellite image actually covers the whole reservoir. It is possible that the image is collected 
+								during the dry season and that the water level of the reservoir is lower than normal, which can impact the manual delineation and underestimate the overall 
+								capacity of the reservoir during modelling. </p>
+							<p> <b>Automatic delineation</b> is less straightforward as it makes use of Sentinel-2 data from the European Copernicus project. The approach entails the 
+								combination of various bands into a new signal that distinguishes land from water. A practical approach to derive the necessary reservoir shapefiles is 
+								provided <a href="https://dges.carleton.ca/CUOSGwiki/index.php/Extracting_Shoreline_Polygons_and_Polylines_from_Sentinel-2_Imagery" target="_blank">here</a>, 
+								with the sidenote that (1) the online Copernicus Data System looks a bit different and (2) the final goal was to extract the water bodies (not the land). 
+								This also causes the identification of some clouds as water bodies, though a specific extraction ('save selected features') in a new shapefile is possible. 
+								Within this new shapefile, we notice that the delineation of the Amaluza reservoir is challenged by a low resolution and quality, and the partially coverage 
+								of the water surface by water hyacinth. This limits the classification as water and causes the Amaluza reservoir to be fractioned. To counter this issue, 
+								we can create additional polygons to ultimately obtain a single feature (through the procedure 'dissolve'). Prior to saving this shapefile with both reservoirs, 
+								a visual check is highly recommended to determine the overlap and manually improve the boundaries if deemed necessary. </p>
+							
+							<header>
+								<h3>Land use characterization</h3>
+							</header>
+							<p> We now have the very basic spatial elements (DEM, rivers, and reservoirs) to derive the watershed and subbasing, but more information on the activities 
+								within the basin is needed to move on towards the definition of hydrological response units. More specifically, information on the <b>land use</b> is needed 
+								to determine hydrological properties (like interception, evaporation, transpiration). For this, land use maps with a horizontal resolution of about 400 m 
+								are available on the SWAT+ webpage (click <a href="https://swat.tamu.edu/data/" target="_blank">here</a>). These land use maps are based on the unsupervised 
+								classification of 1-km AVHRR (Advanced Very High Resolution Radiometer) 10-day NDVI (Normalized Difference Vegetation Index ) composites, collected between 
+								April 1992 and March 1993. More information on these maps can be found
+								<a href="https://www.usgs.gov/centers/eros/science/usgs-eros-archive-land-cover-products-global-land-cover-characterization-glcc?qt-science_center_objects=0#qt-science_center_objects" target="_blank">here</a>. </p>
+							<p> As the spatial extent of these maps is too wide for our study area, we start by clipping the raster in QGIS according to the same extents mentioned earlier 
+								and reprojecting it to a different coordinate reference system (from CRS WGS84 to UTM 17S; EPSG 4326 to 32717). Within this raster, each pixel is assigned a 
+								specific numerical code that links to a unique land use category. The example database within the SWAT+ documentation reports at least 24 different categories,
+								but only a subset of these land uses are encountered within our study area. These codes can be found in the table below (including SWAT-code and explanation, 
+								based on the databases plants.plt and urban.urb), to indicate the different types of land uses observed within the spatial extent of the clipped land use 
+								raster. It is also this clipped version of the land use raster that will be used for modelling purposes in QSWAT+ (the shapefile-clipped versions are too rough around the watershed edges). </p>
+							
+							<!-- Table -->
+							<div class="table-wrapper">
+								<table>
+									<thead >
+										<tr>
+											<th style="text-align: left">Landuse ID</th>
+											<th style="text-align: left">SWAT-code</th>
+											<th style="text-align: left">Explanation</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td style="text-align: left">1</td>
+											<td style="text-align: left">URMD</td>
+											<td style="text-align: left">Residential - Medium density</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">2</td>
+											<td style="text-align: left">CRDY</td>
+											<td style="text-align: left">Dryland cropland and pasture</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">5</td>
+											<td style="text-align: left">CRGR</td>
+											<td style="text-align: left">Cropland/Grassland mosaic</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">6</td>
+											<td style="text-align: left">CRWO</td>
+											<td style="text-align: left">Cropland/Woodland mosaic</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">7</td>
+											<td style="text-align: left">GRAS</td>
+											<td style="text-align: left">Grassland</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">8</td>
+											<td style="text-align: left">SHRB</td>
+											<td style="text-align: left">Shrubland</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">10</td>
+											<td style="text-align: left">SAVA</td>
+											<td style="text-align: left">Savanna</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">13</td>
+											<td style="text-align: left">FOEB</td>
+											<td style="text-align: left">Evergreen broadleef forest</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">21</td>
+											<td style="text-align: left">TUWO</td>
+											<td style="text-align: left">Wooded tundra</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">22</td>
+											<td style="text-align: left">TUMI</td>
+											<td style="text-align: left">Mixed tundra</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+							<header>
+								<h3>Soil characterization</h3>
+							</header>
+							<p> In addition to the land use raster, more information is needed from the soils within the basin to determine local and regional hydrological properties (like 
+								water content, permeability, ...). For this, soil maps with a horizontal resolution of about 7500 m are available on the SWAT+ webpage (click 
+								<a href="https://swat.tamu.edu/data/" target="_blank">here</a>). Similar to the land use maps, we start by clipping the raster in QGIS according to the same 
+								extents mentioned earlier and reprojecting it to a different coordinate reference system (from CRS WGS84 to UTM 17S; EPSG 4326 to 32717). Within this raster, 
+								each pixel is assigned a specific numerical code that links to a unique soil category. These codes can be found in the table below to indicate the different 
+								types of soils observed within the spatial extent of the clipped soil raster. It is also this clipped version of the soil raster that will be used for 
+								modelling purposes in QSWAT+ (the shapefile-clipped versions are too rough around the watershed edges). </p>
+
+							<!-- Table -->
+							<div class="table-wrapper">
+								<table >
+									<thead >
+										<tr>
+											<th style="text-align: left">Soil ID</th>
+											<th style="text-align: left">SWAT-code</th>
+											<th style="text-align: left"><a href="https://swat.tamu.edu/media/116412/readme.pdf", target="_blank"></a>Explanation</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td style="text-align: left">1</td>
+											<td style="text-align: left">Bh3-3c-5411</td>
+											<td style="text-align: left">Humic cambisols</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">2</td>
+											<td style="text-align: left">I-To-c-5541</td>
+											<td style="text-align: left">Lithosols - Ochric Andosols</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">3</td>
+											<td style="text-align: left">Tm1-a-5673</td>
+											<td style="text-align: left">Mollic Andosols</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">4</td>
+											<td style="text-align: left">I-Bh-To-c-5517</td>
+											<td style="text-align: left">Lithosols - Humic Cambisols - Ochric Andosols</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">5</td>
+											<td style="text-align: left">Tv2-b-5677</td>
+											<td style="text-align: left">Vitric Andosols</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">6</td>
+											<td style="text-align: left">Hl17-3b-5500</td>
+											<td style="text-align: left">Luvic Phaeozems</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">7</td>
+											<td style="text-align: left">Th3-c-5667</td>
+											<td style="text-align: left">Humic Andosols</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">8</td>
+											<td style="text-align: left">Ao13-3c-5366</td>
+											<td style="text-align: left">Orthic Acrisols</td>
+										</tr>
+										<tr>
+											<td style="text-align: left">9</td>
+											<td style="text-align: left">I-Fh-Ne-T-5521</td>
+											<td style="text-align: left">Lithosols - Humic Ferralsols - Eutric Nitosols</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+							<header>
+								<h3>Watershed delineation</h3>
+							</header>
+							<p style="margin-bottom: 1%"> The previous steps allow to collect all the necessary input to start developing our hydrological model of the Paute river in 
+								<b>(Q)SWAT+</b>. To do so, we rely on the introduction to SWAT+ as provided by the YouTube channel 
+								<a href="https://www.youtube.com/playlist?list=PLK7YBpqQP_ePv-EVoWqPl_Bt2CmORifad" target="_blank">Open Water Network</a>. More specifically, the 
+								following specific steps are taken within the QSWAT+ software: 
+								<ol>
+									<li> Loading of the clipped DEM and Paute river network </li>
+									<li> Addition of reservoirs as lakes (Selecting the check box ignores the info boxes that pop up due to delineation inaccuracies originating from channels 
+										 crossing the reservoir boundaries) </li>
+									<li> Addition of clipped land use and soil characteristics , along with the associated info tables ('global_landuses', 'global_soils', 'global_usersoil'). 
+										 For plants and urban regions, tables with the same name are selected </li>
+									<li> An extra slope band (at 10%) is added and merging of small channels is allowed when they cover max. 10% of the subbasin </li>
+									<li> No additional changes are made in the HRU tab </li>
+								</ol> </p>
+							
+							<p> By implementing all these steps, the Paute river basin can be delineated and hydrological response units can be derived from the prevailing land use and 
+								soils throughout the watershed. Normally, no further adaptations are necessary (unless, of course, new information on DEM, land use, or soils is obtained) 
+								and this delineated watershed can be used for all subsequent modelling scenarios. This means that the next step is the data preparation to correctly 
+								represent the climate throughout the basin and act as meteorological time series at very specific locations. More information on this can be found on the 
+								page related to <a href="preparation.html"><i>Data preparation</i></a>. </p>
+
+							<div class="box alt">
+								<div class="row gtr-50 gtr-uniform">
+									<div class="col-4"><span class="image fit"><img src="../images/C01_Main.JPG" alt="" /></span></div>
+									<div class="col-4"><span class="image fit"><img src="../images/C01_Reservoir.JPG" alt="" /></span></div>
+									<div class="col-4"><span class="image fit"><img src="../images/C02_Main.JPG" alt="" /></span></div>
+								</div>
+							</div>
+
+						</section>
+
+					</div>
+
+				<!-- Footer -->
+				<footer id="footer">
+					<section class="split contact">
+						<section class="alt">
+							<p><b>Ecuador</b><br />
+								Laboratorio de Ecología Acuática (LEA)<br />
+								Av. Víctor Manuel Albornoz, 010207 Cuenca, Ecuador<br />
+							</p>
+						</section>
+					</section>
+					<section class="split contact">
+						<section class="alt">
+							<p><b>Belgium</b><br />
+								<a href="https://www.ugent.be/bw/asae/en/research/aeco" target="_blank">Research group Aquatic Ecology (AECO)</a><br />
+								Coupure Link 653, 9000 Ghent, Belgium
+							</p>
+						</section>
+					</section>
+					<section class="split contact">
+						<section>
+							<div class="image main"><img src="../images/EULogo.png" alt="" /></div>
+						</section>
+					</section>
+				</footer>	
+
+				<!-- Copyright -->
+					<div id="copyright">
+						<ul><li>&copy; <a href="https://wvechelp.github.io/">WVE</a></li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li><li>Images: WVE</li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/browser.min.js"></script>
+			<script src="../assets/js/breakpoints.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
